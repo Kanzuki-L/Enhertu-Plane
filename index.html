@@ -11,36 +11,33 @@
       #orientation-lock {
         display: none;
         position: fixed;
-        z-index: 9999;
-        background: #000;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background-color: #000;
         color: #fff;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        z-index: 9999;
         justify-content: center;
         align-items: center;
-        flex-direction: column;
         text-align: center;
         font-size: 24px;
         padding: 20px;
+        flex-direction: column;
       }
     </style>
   </head>
   <body>
     <div id="orientation-lock">
-      Please rotate your device to <strong>landscape mode</strong> to play the game.
+      Please rotate your device to <strong>landscape mode</strong> to continue playing.
     </div>
 
     <div id="unity-container">
-      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"></div>
+      <div id="unity-warning"> </div>
     </div>
 
     <script>
@@ -50,23 +47,24 @@
         }
       });
 
-      var container = document.querySelector("#unity-container");
-      var canvas = document.querySelector("#unity-canvas");
-      var loadingBar = document.querySelector("#unity-loading-bar");
-      var progressBarFull = document.querySelector("#unity-progress-bar-full");
-      var warningBanner = document.querySelector("#unity-warning");
+      const container = document.querySelector("#unity-container");
+      const canvas = document.querySelector("#unity-canvas");
+      const loadingBar = document.querySelector("#unity-loading-bar");
+      const progressBarFull = document.querySelector("#unity-progress-bar-full");
+      const warningBanner = document.querySelector("#unity-warning");
+      const orientationLock = document.getElementById("orientation-lock");
 
       function unityShowBanner(msg, type) {
         function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
         }
-        var div = document.createElement('div');
+        const div = document.createElement("div");
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type === 'error') div.style = 'background: red; padding: 10px;';
+        if (type === "error") div.style = "background: red; padding: 10px;";
         else {
-          if (type === 'warning') div.style = 'background: yellow; padding: 10px;';
-          setTimeout(function () {
+          if (type === "warning") div.style = "background: yellow; padding: 10px;";
+          setTimeout(() => {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -74,13 +72,13 @@
         updateBannerVisibility();
       }
 
-      var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/41f032b202f235744a19156798628b0a.loader.js";
-      var config = {
+      const buildUrl = "Build";
+      const loaderUrl = buildUrl + "/45e1dcea6291f898c5a205bc86ce629c.loader.js";
+      const config = {
         arguments: [],
-        dataUrl: buildUrl + "/b952586c54116ead4e6bb194d3803a0a.data.unityweb",
+        dataUrl: buildUrl + "/bf8ccaf59c3019ec58ebf93bc9341fe0.data.unityweb",
         frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
-        codeUrl: buildUrl + "/46f7ec29b6413b3c086cf63ff8ac02bf.wasm.unityweb",
+        codeUrl: buildUrl + "/54191187fd0ae655431c15ba254a15c0.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Evoweb",
         productName: "Enhertu Claw Game",
@@ -89,20 +87,20 @@
       };
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        var meta = document.createElement('meta');
-        meta.name = 'viewport';
-        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
+        const meta = document.createElement("meta");
+        meta.name = "viewport";
+        meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+        document.head.appendChild(meta);
       }
 
       loadingBar.style.display = "block";
 
-      var script = document.createElement("script");
+      const script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
+        }).then(() => {
           loadingBar.style.display = "none";
         }).catch((message) => {
           alert(message);
@@ -111,20 +109,17 @@
       document.body.appendChild(script);
 
       function checkOrientation() {
-        const lockScreen = document.getElementById('orientation-lock');
-        const gameContainer = document.getElementById('unity-container');
-
         if (window.innerHeight > window.innerWidth) {
-          lockScreen.style.display = "flex";
-          gameContainer.style.display = "none";
+          orientationLock.style.display = "flex";
+          container.style.display = "none";
         } else {
-          lockScreen.style.display = "none";
-          gameContainer.style.display = "block";
+          orientationLock.style.display = "none";
+          container.style.display = "block";
         }
       }
 
-      window.addEventListener("orientationchange", checkOrientation);
       window.addEventListener("resize", checkOrientation);
+      window.addEventListener("orientationchange", checkOrientation);
       checkOrientation();
     </script>
   </body>
