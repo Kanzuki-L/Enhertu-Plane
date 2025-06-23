@@ -1,97 +1,108 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
-    <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>Enhertu Plane Game</title>
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
-    <link rel="stylesheet" href="TemplateData/style.css">
-    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes" />
     <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: #000;
+        height: 100%;
+        overflow: hidden;
+      }
       #orientation-lock {
         display: none;
         position: fixed;
-        top: 0; left: 0; right: 0; bottom: 0;
+        top: 0; left: 0;
+        width: 100vw;
+        height: 100vh;
         background-color: #000;
         color: #fff;
-        z-index: 9999;
+        z-index: 10000;
         justify-content: center;
         align-items: center;
         text-align: center;
-        font-size: 24px;
+        font-size: 20px;
         padding: 20px;
         flex-direction: column;
+      }
+      #unity-container {
+        width: 100%;
+        height: 100%;
+        position: relative;
+      }
+      #unity-canvas {
+        width: 100%;
+        height: 100%;
+        background: #000;
       }
     </style>
   </head>
   <body>
     <div id="orientation-lock">
-      Please rotate your device to <strong>landscape mode</strong> to continue playing.
+      Please rotate your device to <strong>landscape mode</strong> to play.
     </div>
 
     <div id="unity-container">
-      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
       </div>
-      <div id="unity-warning"> </div>
+      <div id="unity-warning"></div>
     </div>
 
     <script>
-      window.addEventListener("load", function () {
+      window.addEventListener("load", () => {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
         }
       });
 
-      const container = document.querySelector("#unity-container");
-      const canvas = document.querySelector("#unity-canvas");
-      const loadingBar = document.querySelector("#unity-loading-bar");
-      const progressBarFull = document.querySelector("#unity-progress-bar-full");
-      const warningBanner = document.querySelector("#unity-warning");
+      const container = document.getElementById("unity-container");
+      const canvas = document.getElementById("unity-canvas");
+      const loadingBar = document.getElementById("unity-loading-bar");
+      const progressBarFull = document.getElementById("unity-progress-bar-full");
+      const warningBanner = document.getElementById("unity-warning");
       const orientationLock = document.getElementById("orientation-lock");
 
       function unityShowBanner(msg, type) {
-        function updateBannerVisibility() {
-          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
-        }
         const div = document.createElement("div");
         div.innerHTML = msg;
         warningBanner.appendChild(div);
-        if (type === "error") div.style = "background: red; padding: 10px;";
-        else {
-          if (type === "warning") div.style = "background: yellow; padding: 10px;";
+        div.style = type === "error"
+          ? "background: red; padding: 10px;"
+          : "background: yellow; padding: 10px;";
+        if (type !== "error") {
           setTimeout(() => {
             warningBanner.removeChild(div);
-            updateBannerVisibility();
+            warningBanner.style.display = warningBanner.children.length ? "block" : "none";
           }, 5000);
         }
-        updateBannerVisibility();
+        warningBanner.style.display = "block";
       }
 
       const buildUrl = "Build";
-      const loaderUrl = buildUrl + "/45e1dcea6291f898c5a205bc86ce629c.loader.js";
       const config = {
-        arguments: [],
-        dataUrl: buildUrl + "/bf8ccaf59c3019ec58ebf93bc9341fe0.data.unityweb",
+        dataUrl: buildUrl + "/54f098fbc9d182bf0cf39a740ae540a9.data.unityweb",
         frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
-        codeUrl: buildUrl + "/54191187fd0ae655431c15ba254a15c0.wasm.unityweb",
+        codeUrl: buildUrl + "/9d9dc6233d3df2a1c6257ee4af79c5fb.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Evoweb",
-        productName: "Enhertu Claw Game",
+        productName: "Enhertu Plane Game",
         productVersion: "0.1.0",
         showBanner: unityShowBanner,
       };
 
-      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-        const meta = document.createElement("meta");
-        meta.name = "viewport";
-        meta.content = "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
-        document.head.appendChild(meta);
-      }
+      const loaderUrl = buildUrl + "/8988be86b5d6a251420449435b2c766c.loader.js";
 
       loadingBar.style.display = "block";
 
@@ -102,20 +113,14 @@
           progressBarFull.style.width = 100 * progress + "%";
         }).then(() => {
           loadingBar.style.display = "none";
-        }).catch((message) => {
-          alert(message);
-        });
+        }).catch(alert);
       };
       document.body.appendChild(script);
 
       function checkOrientation() {
-        if (window.innerHeight > window.innerWidth) {
-          orientationLock.style.display = "flex";
-          container.style.display = "none";
-        } else {
-          orientationLock.style.display = "none";
-          container.style.display = "block";
-        }
+        const isPortrait = window.innerHeight > window.innerWidth;
+        orientationLock.style.display = isPortrait ? "flex" : "none";
+        container.style.display = isPortrait ? "none" : "block";
       }
 
       window.addEventListener("resize", checkOrientation);
