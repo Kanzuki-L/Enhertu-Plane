@@ -75,12 +75,12 @@
       }
 
       var buildUrl = "Build";
-      var loaderUrl = buildUrl + "/02513fa78fae985a8d84c7a9bbd49663.loader.js";
+      var loaderUrl = buildUrl + "/41f032b202f235744a19156798628b0a.loader.js";
       var config = {
         arguments: [],
-        dataUrl: buildUrl + "/baf3909eb953d376cef548096bd8cb96.data.unityweb",
+        dataUrl: buildUrl + "/b952586c54116ead4e6bb194d3803a0a.data.unityweb",
         frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
-        codeUrl: buildUrl + "/507fdb6a64ff2e8179d15edc851a6750.wasm.unityweb",
+        codeUrl: buildUrl + "/46f7ec29b6413b3c086cf63ff8ac02bf.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
         companyName: "Evoweb",
         productName: "Enhertu Claw Game",
@@ -110,7 +110,6 @@
       };
       document.body.appendChild(script);
 
-      // Landscape mode only logic
       function checkOrientation() {
         const lockScreen = document.getElementById('orientation-lock');
         const gameContainer = document.getElementById('unity-container');
@@ -126,7 +125,7 @@
 
       window.addEventListener("orientationchange", checkOrientation);
       window.addEventListener("resize", checkOrientation);
-      checkOrientation(); // Initial check
+      checkOrientation();
     </script>
   </body>
 </html>
