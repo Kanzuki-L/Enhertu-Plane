@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Enhertu Plane Game</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <style>
+      #orientation-lock {
+        display: none;
+        position: fixed;
+        z-index: 9999;
+        background: #000;
+        color: #fff;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        text-align: center;
+        font-size: 24px;
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="orientation-lock">
+      Please rotate your device to <strong>landscape mode</strong> to play the game.
+    </div>
+
+    <div id="unity-container">
+      <canvas id="unity-canvas" width=960 height=600 tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"></div>
+    </div>
+
+    <script>
+      window.addEventListener("load", function () {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("ServiceWorker.js");
+        }
+      });
+
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var warningBanner = document.querySelector("#unity-warning");
+
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type === 'error') div.style = 'background: red; padding: 10px;';
+        else {
+          if (type === 'warning') div.style = 'background: yellow; padding: 10px;';
+          setTimeout(function () {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
+        updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/02513fa78fae985a8d84c7a9bbd49663.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/baf3909eb953d376cef548096bd8cb96.data.unityweb",
+        frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
+        codeUrl: buildUrl + "/507fdb6a64ff2e8179d15edc851a6750.wasm.unityweb",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Evoweb",
+        productName: "Enhertu Claw Game",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+      };
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.getElementsByTagName('head')[0].appendChild(meta);
+      }
+
+      loadingBar.style.display = "block";
+
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+
+      // Landscape mode only logic
+      function checkOrientation() {
+        const lockScreen = document.getElementById('orientation-lock');
+        const gameContainer = document.getElementById('unity-container');
+
+        if (window.innerHeight > window.innerWidth) {
+          lockScreen.style.display = "flex";
+          gameContainer.style.display = "none";
+        } else {
+          lockScreen.style.display = "none";
+          gameContainer.style.display = "block";
+        }
+      }
+
+      window.addEventListener("orientationchange", checkOrientation);
+      window.addEventListener("resize", checkOrientation);
+      checkOrientation(); // Initial check
+    </script>
+  </body>
+</html>
