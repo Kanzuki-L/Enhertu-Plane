@@ -16,50 +16,47 @@
         height: 100%;
         overflow: hidden;
       }
+
       #unity-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
-        background: #000;
-      }
-      #unity-canvas {
-        width: 100%;
+        justify-content: center;
         height: 100%;
         background: #000;
-        touch-action: none;
       }
+
+      #unity-warning {
+        color: white;
+        text-align: center;
+      }
+
       #orientation-lock {
         display: none;
         position: fixed;
+        z-index: 9999;
         top: 0;
         left: 0;
         width: 100vw;
         height: 100vh;
-        background: #000;
-        color: #fff;
+        background: black;
+        color: white;
         font-size: 18px;
-        z-index: 10000;
-        justify-content: center;
+        display: flex;
         align-items: center;
+        justify-content: center;
         text-align: center;
         padding: 20px;
-        flex-direction: column;
       }
     </style>
   </head>
   <body>
     <div id="orientation-lock">
-       Please rotate your device to <strong>landscape mode</strong> to play.
+      🔄 Please rotate your device to <strong>landscape mode</strong> to play.
     </div>
 
     <div id="unity-container">
-      <canvas id="unity-canvas" tabindex="-1"></canvas>
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
       <div id="unity-loading-bar">
         <div id="unity-logo"></div>
         <div id="unity-progress-bar-empty">
@@ -99,11 +96,21 @@
         warningBanner.style.display = "block";
       }
 
+      function checkOrientation() {
+        const isPortrait = window.innerHeight > window.innerWidth;
+        orientationLock.style.display = isPortrait ? "flex" : "none";
+        container.style.display = isPortrait ? "none" : "flex";
+      }
+
+      window.addEventListener("resize", checkOrientation);
+      window.addEventListener("orientationchange", checkOrientation);
+      checkOrientation();
+
       const buildUrl = "Build";
       const loaderUrl = buildUrl + "/8988be86b5d6a251420449435b2c766c.loader.js";
-
       const config = {
-        dataUrl: buildUrl + "/c1f22ff57dca621562a1f130c26dde3c.data.unityweb",
+        arguments: [],
+        dataUrl: buildUrl + "/64390c6bb0525a79d0794a7ba4e4b31b.data.unityweb",
         frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
         codeUrl: buildUrl + "/9d9dc6233d3df2a1c6257ee4af79c5fb.wasm.unityweb",
         streamingAssetsUrl: "StreamingAssets",
@@ -120,21 +127,13 @@
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then(() => {
+        }).then((unityInstance) => {
           loadingBar.style.display = "none";
-        }).catch(alert);
+        }).catch((message) => {
+          alert(message);
+        });
       };
       document.body.appendChild(script);
-
-      function checkOrientation() {
-        const isPortrait = window.innerHeight > window.innerWidth;
-        orientationLock.style.display = isPortrait ? "flex" : "none";
-        container.style.display = isPortrait ? "none" : "block";
-      }
-
-      window.addEventListener("resize", checkOrientation);
-      window.addEventListener("orientationchange", checkOrientation);
-      checkOrientation();
     </script>
   </body>
 </html>
