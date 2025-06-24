@@ -12,9 +12,27 @@
     html, body {
       margin: 0;
       padding: 0;
-      background: black;
       height: 100%;
       overflow: hidden;
+      background-color: black;
+    }
+
+    #orientation-lock {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 9999;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      color: white;
+      font-size: 18px;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      padding: 20px;
     }
 
     #unity-container {
@@ -23,30 +41,12 @@
       align-items: center;
       height: 100%;
     }
-
-    #orientation-lock {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: black;
-      color: white;
-      font-size: 20px;
-      text-align: center;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      flex-direction: column;
-    }
   </style>
 </head>
 <body>
 
-  <div id="orientation-lock">
-     Please rotate your device to <strong>landscape mode</strong> to continue.
+  <div id="orientation-lock" style="display: none; flex;">
+     Please rotate your device to <strong>landscape</strong> mode to continue playing.
   </div>
 
   <div id="unity-container">
@@ -92,8 +92,13 @@
 
     function checkOrientation() {
       const isPortrait = window.innerHeight > window.innerWidth;
-      orientationLock.style.display = isPortrait ? "flex" : "none";
-      container.style.display = isPortrait ? "none" : "flex";
+      if (isPortrait && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+        orientationLock.style.display = "flex";
+        container.style.display = "none";
+      } else {
+        orientationLock.style.display = "none";
+        container.style.display = "flex";
+      }
     }
 
     window.addEventListener("resize", checkOrientation);
@@ -101,12 +106,12 @@
     checkOrientation();
 
     const buildUrl = "Build";
-    const loaderUrl = buildUrl + "/69dcf4b3bd8f68c0f3261f4f1dbc02ba.loader.js";
+    const loaderUrl = buildUrl + "/b0771b3aef4e261b53b86dea23d39870.loader.js";
     const config = {
       arguments: [],
-      dataUrl: buildUrl + "/a6048b32c2580ae474693d3078362b51.data.unityweb",
+      dataUrl: buildUrl + "/b9ea3fb702650651b3441d65232e8b67.data.unityweb",
       frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
-      codeUrl: buildUrl + "/e6d77014a5d506c3c876e83508b56f37.wasm.unityweb",
+      codeUrl: buildUrl + "/3c084df0649db5c2d3671f8ecb2dabaa.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
       companyName: "Evoweb",
       productName: "Enhertu Plane Game",
@@ -129,5 +134,6 @@
     };
     document.body.appendChild(script);
   </script>
+
 </body>
 </html>
