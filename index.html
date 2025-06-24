@@ -14,25 +14,7 @@
       padding: 0;
       height: 100%;
       overflow: hidden;
-      background-color: black;
-    }
-
-    #orientation-lock {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 9999;
-      width: 100vw;
-      height: 100vh;
       background: black;
-      color: white;
-      font-size: 18px;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      padding: 20px;
     }
 
     #unity-container {
@@ -41,12 +23,30 @@
       align-items: center;
       height: 100%;
     }
+
+    #orientation-lock {
+      display: none;
+      position: fixed;
+      z-index: 9999;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: black;
+      color: white;
+      font-size: 18px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
   </style>
 </head>
 <body>
 
-  <div id="orientation-lock" style="display: none; flex;">
-     Please rotate your device to <strong>landscape</strong> mode to continue playing.
+  <div id="orientation-lock">
+     Please rotate your device to <strong>landscape</strong> mode to continue.
   </div>
 
   <div id="unity-container">
@@ -92,7 +92,8 @@
 
     function checkOrientation() {
       const isPortrait = window.innerHeight > window.innerWidth;
-      if (isPortrait && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile && isPortrait) {
         orientationLock.style.display = "flex";
         container.style.display = "none";
       } else {
@@ -109,7 +110,7 @@
     const loaderUrl = buildUrl + "/b0771b3aef4e261b53b86dea23d39870.loader.js";
     const config = {
       arguments: [],
-      dataUrl: buildUrl + "/b9ea3fb702650651b3441d65232e8b67.data.unityweb",
+      dataUrl: buildUrl + "/c346dc89a1391a07b6fa289817222ee1.data.unityweb",
       frameworkUrl: buildUrl + "/aa7ae2ead50673ee85501f682ab00562.framework.js.unityweb",
       codeUrl: buildUrl + "/3c084df0649db5c2d3671f8ecb2dabaa.wasm.unityweb",
       streamingAssetsUrl: "StreamingAssets",
