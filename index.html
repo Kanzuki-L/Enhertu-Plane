@@ -5,13 +5,13 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <title>Enhertu Plane Game</title>
 
-  <!-- Meta and Asset Links -->
+  <!-- Assets -->
   <link rel="shortcut icon" href="TemplateData/favicon.ico" />
   <link rel="stylesheet" href="TemplateData/style.css" />
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes" />
 
-  <!-- Page Styles -->
+  <!-- Embedded Styles -->
   <style>
     html, body {
       margin: 0;
@@ -54,33 +54,36 @@
 </head>
 
 <body>
-  <!-- Orientation Warning -->
+  <!-- Orientation Lock Message -->
   <div id="orientation-lock">
     Please rotate your device to <strong>landscape</strong> to play the game.
   </div>
 
-  <!-- Unity Game Canvas -->
+  <!-- Unity WebGL Container -->
   <div id="unity-container">
     <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+
+    <!-- Loading Bar -->
     <div id="unity-loading-bar">
       <div id="unity-logo"></div>
       <div id="unity-progress-bar-empty">
         <div id="unity-progress-bar-full"></div>
       </div>
     </div>
+
+    <!-- Warning Message -->
     <div id="unity-warning"></div>
   </div>
 
-  <!-- Unity Loader Script -->
+  <!-- Initialization Script -->
   <script>
-    // Register Service Worker
     window.addEventListener("load", () => {
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker.register("ServiceWorker.js");
       }
     });
 
-    // DOM References
+    // DOM references
     const container = document.getElementById("unity-container");
     const canvas = document.getElementById("unity-canvas");
     const loadingBar = document.getElementById("unity-loading-bar");
@@ -88,7 +91,7 @@
     const warningBanner = document.getElementById("unity-warning");
     const orientationLock = document.getElementById("orientation-lock");
 
-    // Unity Banner Message
+    // Show banner for errors/warnings
     function unityShowBanner(message, type) {
       const div = document.createElement("div");
       div.innerHTML = message;
@@ -105,7 +108,7 @@
       warningBanner.style.display = warningBanner.children.length ? "block" : "none";
     }
 
-    // Mobile Orientation Lock Handler
+    // Handle orientation lock for mobile
     function checkOrientation() {
       const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       const isPortrait = window.innerHeight > window.innerWidth;
@@ -123,29 +126,28 @@
     window.addEventListener("orientationchange", checkOrientation);
     checkOrientation(); // Initial check
 
-    // Unity Build Configuration
+    // Unity Build Info
     const buildUrl = "Build";
     const loaderUrl = `${buildUrl}/582c6221f4606a97d273e27c729f7041.loader.js`;
-
     const config = {
       arguments: [],
-      dataUrl: `${buildUrl}/37ab6c07e22a9c5737b2304616bcc063.data.unityweb`,
+      dataUrl: `${buildUrl}/294e41207f43f5efc2eaf0d5df76b69a.data.unityweb`, // Updated data URL
       frameworkUrl: `${buildUrl}/566c0a5e1c01cfabdcc455557cec079e.framework.js.unityweb`,
       codeUrl: `${buildUrl}/a750d4c5822d6eca3aeee0b1d02c6cf3.wasm.unityweb`,
       streamingAssetsUrl: "StreamingAssets",
       companyName: "Evoweb",
       productName: "Enhertu Plane Game",
-      productVersion: "0.1.2",
+      productVersion: "0.1.2", // Updated version
       showBanner: unityShowBanner,
     };
 
-    // Load Unity
+    // Load Unity WebGL app
     loadingBar.style.display = "block";
     const script = document.createElement("script");
     script.src = loaderUrl;
     script.onload = () => {
       createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = `${100 * progress}%`;
+        progressBarFull.style.width = `${progress * 100}%`;
       }).then(() => {
         loadingBar.style.display = "none";
       }).catch((error) => {
