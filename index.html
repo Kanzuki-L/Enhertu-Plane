@@ -1,160 +1,155 @@
 <!DOCTYPE html>
 <html lang="en-us">
-<head>
-  <meta charset="utf-8" />
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <title>Enhertu Plane Game</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes" />
+    <title>Enhertu Plane Game</title>
 
-  <!-- Assets -->
-  <link rel="shortcut icon" href="TemplateData/favicon.ico" />
-  <link rel="stylesheet" href="TemplateData/style.css" />
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes" />
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
+    <link rel="manifest" href="manifest.webmanifest" />
 
-  <!-- Embedded Styles -->
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      background: black;
-      height: 100%;
-      overflow: hidden;
-    }
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background: black;
+        height: 100%;
+        overflow: hidden;
+      }
 
-    #unity-container {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100%;
-    }
+      #unity-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+      }
 
-    #orientation-lock {
-      display: none;
-      position: fixed;
-      z-index: 9999;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: black;
-      color: white;
-      font-size: 20px;
-      text-align: center;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      flex-direction: column;
-    }
+      #orientation-lock {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: black;
+        color: white;
+        font-size: 20px;
+        text-align: center;
+        padding: 20px;
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
 
-    #orientation-lock img {
-      width: 100px;
-      margin-bottom: 20px;
-    }
-  </style>
-</head>
+      #orientation-lock img {
+        width: 100px;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
 
-<body>
-  <!-- Orientation Lock Message -->
-  <div id="orientation-lock">
-    Please rotate your device to <strong>landscape</strong> to play the game.
-  </div>
-
-  <!-- Unity WebGL Container -->
-  <div id="unity-container">
-    <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
-
-    <!-- Loading Bar -->
-    <div id="unity-loading-bar">
-      <div id="unity-logo"></div>
-      <div id="unity-progress-bar-empty">
-        <div id="unity-progress-bar-full"></div>
-      </div>
+  <body>
+    <div id="orientation-lock">
+      Please rotate your device to <strong>landscape</strong> to play the game.
     </div>
 
-    <!-- Warning Message -->
-    <div id="unity-warning"></div>
-  </div>
+    <div id="unity-container">
+      <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+      <div id="unity-loading-bar">
+        <div id="unity-logo"></div>
+        <div id="unity-progress-bar-empty">
+          <div id="unity-progress-bar-full"></div>
+        </div>
+      </div>
+      <div id="unity-warning"></div>
+    </div>
 
-  <!-- Initialization Script -->
-  <script>
-    window.addEventListener("load", () => {
-      if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("ServiceWorker.js");
-      }
-    });
-
-    // DOM references
-    const container = document.getElementById("unity-container");
-    const canvas = document.getElementById("unity-canvas");
-    const loadingBar = document.getElementById("unity-loading-bar");
-    const progressBarFull = document.getElementById("unity-progress-bar-full");
-    const warningBanner = document.getElementById("unity-warning");
-    const orientationLock = document.getElementById("orientation-lock");
-
-    // Show banner for errors/warnings
-    function unityShowBanner(message, type) {
-      const div = document.createElement("div");
-      div.innerHTML = message;
-      div.style = `padding: 10px; background: ${type === "error" ? "red" : "yellow"}`;
-      warningBanner.appendChild(div);
-
-      if (type !== "error") {
-        setTimeout(() => {
-          warningBanner.removeChild(div);
-          warningBanner.style.display = warningBanner.children.length ? "block" : "none";
-        }, 5000);
-      }
-
-      warningBanner.style.display = warningBanner.children.length ? "block" : "none";
-    }
-
-    // Handle orientation lock for mobile
-    function checkOrientation() {
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isPortrait = window.innerHeight > window.innerWidth;
-
-      if (isMobile && isPortrait) {
-        orientationLock.style.display = "flex";
-        container.style.display = "none";
-      } else {
-        orientationLock.style.display = "none";
-        container.style.display = "flex";
-      }
-    }
-
-    window.addEventListener("resize", checkOrientation);
-    window.addEventListener("orientationchange", checkOrientation);
-    checkOrientation(); // Initial check
-
-    // Unity Build Info
-    const buildUrl = "Build";
-    const loaderUrl = `${buildUrl}/582c6221f4606a97d273e27c729f7041.loader.js`;
-    const config = {
-      arguments: [],
-      dataUrl: `${buildUrl}/294e41207f43f5efc2eaf0d5df76b69a.data.unityweb`, // Updated data URL
-      frameworkUrl: `${buildUrl}/566c0a5e1c01cfabdcc455557cec079e.framework.js.unityweb`,
-      codeUrl: `${buildUrl}/a750d4c5822d6eca3aeee0b1d02c6cf3.wasm.unityweb`,
-      streamingAssetsUrl: "StreamingAssets",
-      companyName: "Evoweb",
-      productName: "Enhertu Plane Game",
-      productVersion: "0.1.2", // Updated version
-      showBanner: unityShowBanner,
-    };
-
-    // Load Unity WebGL app
-    loadingBar.style.display = "block";
-    const script = document.createElement("script");
-    script.src = loaderUrl;
-    script.onload = () => {
-      createUnityInstance(canvas, config, (progress) => {
-        progressBarFull.style.width = `${progress * 100}%`;
-      }).then(() => {
-        loadingBar.style.display = "none";
-      }).catch((error) => {
-        alert(error);
+    <script>
+      window.addEventListener("load", () => {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("ServiceWorker.js");
+        }
       });
-    };
-    document.body.appendChild(script);
-  </script>
-</body>
+
+      const unityCanvas = document.querySelector("#unity-canvas");
+      const loadingBar = document.querySelector("#unity-loading-bar");
+      const progressBarFull = document.querySelector("#unity-progress-bar-full");
+      const warningBanner = document.querySelector("#unity-warning");
+      const orientationLock = document.querySelector("#orientation-lock");
+      const unityContainer = document.querySelector("#unity-container");
+
+      function unityShowBanner(message, type) {
+        const banner = document.createElement("div");
+        banner.innerHTML = message;
+        banner.style.padding = "10px";
+
+        if (type === "error") {
+          banner.style.background = "red";
+        } else if (type === "warning") {
+          banner.style.background = "yellow";
+          setTimeout(() => {
+            warningBanner.removeChild(banner);
+            updateBannerVisibility();
+          }, 5000);
+        }
+
+        warningBanner.appendChild(banner);
+        updateBannerVisibility();
+      }
+
+      function updateBannerVisibility() {
+        warningBanner.style.display = warningBanner.children.length > 0 ? "block" : "none";
+      }
+
+      function checkOrientation() {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isPortrait = window.innerHeight > window.innerWidth;
+
+        if (isMobile && isPortrait) {
+          orientationLock.style.display = "flex";
+          unityContainer.style.display = "none";
+        } else {
+          orientationLock.style.display = "none";
+          unityContainer.style.display = "flex";
+        }
+      }
+
+      window.addEventListener("resize", checkOrientation);
+      window.addEventListener("orientationchange", checkOrientation);
+      checkOrientation();
+
+      const buildUrl = "Build";
+      const loaderUrl = `${buildUrl}/582c6221f4606a97d273e27c729f7041.loader.js`;
+      const config = {
+        dataUrl: `${buildUrl}/414033a14796f0e22ea5428511305971.data.unityweb`,
+        frameworkUrl: `${buildUrl}/566c0a5e1c01cfabdcc455557cec079e.framework.js.unityweb`,
+        codeUrl: `${buildUrl}/a750d4c5822d6eca3aeee0b1d02c6cf3.wasm.unityweb`,
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "Evoweb",
+        productName: "Enhertu Plane Game",
+        productVersion: "0.1.2",
+        showBanner: unityShowBanner,
+        arguments: []
+      };
+
+      loadingBar.style.display = "block";
+      const script = document.createElement("script");
+      script.src = loaderUrl;
+
+      script.onload = () => {
+        createUnityInstance(unityCanvas, config, (progress) => {
+          progressBarFull.style.width = `${progress * 100}%`;
+        }).then((unityInstance) => {
+          loadingBar.style.display = "none";
+        }).catch((error) => {
+          alert(error);
+        });
+      };
+
+      document.body.appendChild(script);
+    </script>
+  </body>
 </html>
